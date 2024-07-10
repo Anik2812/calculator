@@ -95,8 +95,14 @@ const currentOperandTextElement = document.querySelector('.current-operand');
 
 const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement);
 
+function handleButtonClick(button) {
+    button.classList.add('button-press');
+    setTimeout(() => button.classList.remove('button-press'), 100);
+}
+
 numberButtons.forEach(button => {
     button.addEventListener('click', () => {
+        handleButtonClick(button);
         calculator.appendNumber(button.innerText);
         calculator.updateDisplay();
     });
@@ -104,22 +110,71 @@ numberButtons.forEach(button => {
 
 operationButtons.forEach(button => {
     button.addEventListener('click', () => {
+        handleButtonClick(button);
         calculator.chooseOperation(button.innerText);
         calculator.updateDisplay();
     });
 });
 
 equalsButton.addEventListener('click', () => {
+    handleButtonClick(equalsButton);
     calculator.compute();
     calculator.updateDisplay();
 });
 
 allClearButton.addEventListener('click', () => {
+    handleButtonClick(allClearButton);
     calculator.clear();
     calculator.updateDisplay();
 });
 
 deleteButton.addEventListener('click', () => {
+    handleButtonClick(deleteButton);
     calculator.delete();
     calculator.updateDisplay();
+});
+
+document.addEventListener('keydown', (event) => {
+    let key = event.key;
+    const button = document.querySelector(`button[data-number="${key}"], button[data-operation="${key}"]`);
+    
+    if (button) {
+        handleButtonClick(button);
+        if (button.classList.contains('number')) {
+            calculator.appendNumber(key);
+        } else if (button.classList.contains('operator')) {
+            calculator.chooseOperation(key);
+        }
+        calculator.updateDisplay();
+    } else if (key === 'Enter') {
+        handleButtonClick(equalsButton);
+        calculator.compute();
+        calculator.updateDisplay();
+    } else if (key === 'Backspace') {
+        handleButtonClick(deleteButton);
+        calculator.delete();
+        calculator.updateDisplay();
+    } else if (key === 'Escape') {
+        handleButtonClick(allClearButton);
+        calculator.clear();
+        calculator.updateDisplay();
+    }
+});
+
+const calculatorContainer = document.querySelector('.calculator-container');
+const calculator3D = document.querySelector('.calculator');
+
+document.addEventListener('mousemove', (e) => {
+    let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+    let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+    calculatorContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+});
+
+calculator3D.addEventListener('mouseenter', (e) => {
+    calculator3D.style.transition = 'none';
+});
+
+calculator3D.addEventListener('mouseleave', (e) => {
+    calculator3D.style.transition = 'all 0.5s ease';
+    calculator3D.style.transform = 'rotateY(0deg) rotateX(0deg)';
 });
